@@ -3,7 +3,7 @@
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Memory Number Game - Enhanced</title>
+        <title>Memory Game</title>
         <style>
             * {
                 margin: 0;
@@ -52,12 +52,6 @@
                 color: #4a5568;
                 margin-bottom: 10px;
                 font-size: 2.5rem;
-            }
-
-            .game-description {
-                color: #718096;
-                margin-bottom: 30px;
-                font-size: 1.1rem;
             }
 
             .copyright {
@@ -523,51 +517,219 @@
                 margin-top: 10px;
             }
 
+            /* Welcome Screen Styles */
+            .welcome-screen {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                min-height: 100vh;
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                padding: 20px;
+            }
+
+            .welcome-content {
+                text-align: center;
+                background: rgba(255, 255, 255, 0.95);
+                padding: 40px;
+                border-radius: 20px;
+                box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+                backdrop-filter: blur(10px);
+                max-width: 500px;
+                width: 100%;
+                animation: welcomeSlideIn 0.6s ease-out;
+            }
+
+            @keyframes welcomeSlideIn {
+                from {
+                    opacity: 0;
+                    transform: translateY(30px);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+
+            .welcome-content h1 {
+                color: #4a5568;
+                margin-bottom: 30px;
+                font-size: 2.5rem;
+                font-weight: bold;
+            }
+
+            .game-guide {
+                margin-bottom: 30px;
+                text-align: left;
+            }
+
+            .game-guide h3 {
+                color: #4a5568;
+                margin-bottom: 20px;
+                text-align: center;
+                font-size: 1.3rem;
+            }
+
+            .guide-steps {
+                margin-bottom: 20px;
+            }
+
+            .guide-step {
+                display: flex;
+                align-items: center;
+                margin-bottom: 15px;
+                padding: 10px;
+                background: #f7fafc;
+                border-radius: 8px;
+                border-left: 4px solid #48bb78;
+                flex-direction: row;
+                text-align: left;
+            }
+
+            .step-number {
+                background: #48bb78;
+                color: white;
+                width: 24px;
+                height: 24px;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-weight: bold;
+                font-size: 0.9rem;
+                margin-right: 15px;
+                flex-shrink: 0;
+            }
+
+            .step-text {
+                color: #4a5568;
+                font-size: 1rem;
+                line-height: 1.4;
+                text-align: left;
+            }
+
+            .guide-tip {
+                background: linear-gradient(45deg, #fef5e7, #fed7aa);
+                border: 2px solid #ed8936;
+                border-radius: 10px;
+                padding: 15px;
+                color: #744210;
+                font-size: 0.95rem;
+                line-height: 1.4;
+            }
+
+            .start-game-btn {
+                padding: 15px 40px;
+                font-size: 1.3rem;
+                font-weight: bold;
+                cursor: pointer;
+                background: linear-gradient(45deg, #48bb78, #38a169);
+                color: white;
+                border: none;
+                border-radius: 12px;
+                transition: all 0.3s ease;
+                box-shadow: 0 6px 20px rgba(72, 187, 120, 0.3);
+                animation: pulse 2s infinite;
+            }
+
+            .start-game-btn:hover {
+                transform: translateY(-3px);
+                box-shadow: 0 8px 25px rgba(72, 187, 120, 0.4);
+                background: linear-gradient(45deg, #38a169, #2f855a);
+            }
+
+            .start-game-btn:active {
+                transform: translateY(-1px);
+            }
+
+            @keyframes pulse {
+                0% {
+                    box-shadow: 0 6px 20px rgba(72, 187, 120, 0.3);
+                }
+                50% {
+                    box-shadow: 0 6px 20px rgba(72, 187, 120, 0.5);
+                }
+                100% {
+                    box-shadow: 0 6px 20px rgba(72, 187, 120, 0.3);
+                }
+            }
+
             @media (max-width: 480px) {
-                .game-container {
-                    padding: 20px;
+                .welcome-content {
+                    padding: 25px;
                 }
 
-                h1 {
+                .welcome-content h1 {
                     font-size: 2rem;
                 }
 
-                .current-number {
-                    font-size: 3rem;
+                .start-game-btn {
+                    padding: 12px 30px;
+                    font-size: 1.1rem;
                 }
 
-                .choice-btn {
-                    padding: 12px 20px;
-                    font-size: 1.3rem;
+                .guide-step {
+                    flex-direction: row;
+                    text-align: left;
                 }
 
-                .game-stats {
-                    flex-direction: column;
-                    gap: 10px;
-                }
-
-                .modal-content {
-                    margin: 5% auto;
-                    padding: 20px;
-                }
-
-                .modal-buttons {
-                    flex-direction: column;
-                }
-
-                .game-over-buttons {
-                    flex-direction: column;
-                    align-items: center;
+                .step-number {
+                    margin-right: 15px;
+                    margin-bottom: 0;
                 }
             }
         </style>
     </head>
     <body>
-        <div class="game-container">
-            <h2 style="margin-bottom: 12px">🏆 Memory Number Game 🏆</h2>
-            <p class="game-description">
-                Nhớ số hiện tại và chọn số của vòng trước!
-            </p>
+        <!-- Welcome Screen (chỉ hiện lần đầu) -->
+        <div class="welcome-screen" id="welcomeScreen">
+            <div class="welcome-content">
+                <h2 style="margin-bottom: 12px">🏆 Memory Game 🏆</h2>
+                <div class="game-guide">
+                    <div class="guide-steps">
+                        <div class="guide-step">
+                            <span class="step-number">1</span>
+                            <span class="step-text"
+                                >Mỗi vòng, một số ngẫu nhiên (từ 1-100) sẽ xuất
+                                hiện. Bạn cần
+                                <b
+                                    ><u><i>ghi nhớ số này</i></u></b
+                                >
+                                để sử dụng ở vòng tiếp theo.</span
+                            >
+                        </div>
+                        <div class="guide-step">
+                            <span class="step-number">2</span>
+                            <span class="step-text"
+                                >Từ vòng thứ hai, nhiệm vụ của bạn là
+                                <u
+                                    ><b><i>chọn đúng số đã xuất hiện</i></b></u
+                                >
+                                ở vòng trước đó.</span
+                            >
+                        </div>
+                        <div class="guide-step">
+                            <span class="step-number">3</span>
+                            <span class="step-text"
+                                >Bạn có 5 giây để vừa ghi nhớ vừa trả lời. Trò
+                                chơi kết thúc khi bạn chọn sai hoặc hết thời
+                                gian</span
+                            >
+                        </div>
+                    </div>
+                    <div class="guide-tip">
+                        💡 <strong>Mẹo:</strong>Sử dụng trí nhớ ngắn hạn, tập
+                        trung và chọn chính xác số của mỗi vòng!
+                    </div>
+                </div>
+                <button class="start-game-btn" onclick="game.startFirstGame()">
+                    🚀 Bắt đầu chơi
+                </button>
+            </div>
+        </div>
+
+        <!-- Game Container (ẩn ban đầu) -->
+        <div class="game-container" id="gameContainer" style="display: none">
+            <h2 style="margin-bottom: 12px">🏆 Memory Game 🏆</h2>
             <div
                 class="stat-item"
                 style="
@@ -659,9 +821,12 @@
                     this.memoryTime = 3;
                     this.answerTime = 5;
                     this.apiUrl =
-                        "https://temp-game-f1fuepgef-truyenle1s-projects-5e10f5ac.vercel.app/api/score";
+                        "https://temp-game-qify8bl52-truyenle1s-projects-5e10f5ac.vercel.app/api/score";
+                    this.isFirstTime = true; // Thêm flag để kiểm tra lần đầu
 
                     this.elements = {
+                        welcomeScreen: document.getElementById("welcomeScreen"),
+                        gameContainer: document.getElementById("gameContainer"),
                         currentNumber: document.getElementById("currentNumber"),
                         choicesContainer:
                             document.getElementById("choicesContainer"),
@@ -681,11 +846,23 @@
                 }
 
                 init() {
+                    // Luôn hiện welcome screen mỗi khi reload trang
+                    this.elements.welcomeScreen.style.display = "flex";
+                    this.elements.gameContainer.style.display = "none";
+                }
+
+                startFirstGame() {
+                    // Ẩn welcome screen và hiện game container
+                    this.elements.welcomeScreen.style.display = "none";
+                    this.elements.gameContainer.style.display = "block";
+                    this.isFirstTime = false;
+
+                    // Bắt đầu game
                     this.startRound();
                 }
 
                 generateRandomNumber() {
-                    return Math.floor(Math.random() * 10) + 1;
+                    return Math.floor(Math.random() * 100) + 1;
                 }
 
                 generateChoices(correctNumber) {
@@ -886,6 +1063,14 @@
                 showNameInput() {
                     this.elements.finalScore.textContent = this.score;
                     this.elements.nameInputModal.style.display = "block";
+
+                    // Auto-fill tên đã lưu trước đó
+                    const savedName =
+                        localStorage.getItem("memoryGameUserName");
+                    if (savedName) {
+                        this.elements.userName.value = savedName;
+                    }
+
                     this.elements.userName.focus();
                 }
 
@@ -918,6 +1103,9 @@
                         alert("Vui lòng nhập tên của bạn!");
                         return;
                     }
+
+                    // Lưu tên người dùng vào localStorage
+                    localStorage.setItem("memoryGameUserName", userName);
 
                     // Set loading state
                     this.setSaveButtonLoading(true);
