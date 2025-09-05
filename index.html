@@ -1,0 +1,1074 @@
+<!DOCTYPE html>
+<html lang="vi">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Memory Number Game - Enhanced</title>
+        <style>
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
+
+            body {
+                font-family: "Arial", sans-serif;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                min-height: 100vh;
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                color: #333;
+                /* Đảm bảo background không bị dính màu trắng khi scroll */
+                background-attachment: fixed;
+                /* Chặn bounce effect trên iOS */
+                overscroll-behavior: none;
+                -webkit-overflow-scrolling: touch;
+            }
+
+            html {
+                /* Chặn bounce effect trên iOS */
+                overscroll-behavior: none;
+                -webkit-overflow-scrolling: touch;
+            }
+
+            .game-container {
+                text-align: center;
+                background: rgba(255, 255, 255, 0.95);
+                padding: 32px 40px;
+                padding-top: 48px;
+                padding-bottom: 48px;
+                border-radius: 20px;
+                box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+                backdrop-filter: blur(10px);
+                max-width: 500px;
+                width: 90%;
+                margin-top: 32px;
+                margin-bottom: 32px;
+            }
+
+            h1 {
+                color: #4a5568;
+                margin-bottom: 10px;
+                font-size: 2.5rem;
+            }
+
+            .game-description {
+                color: #718096;
+                margin-bottom: 30px;
+                font-size: 1.1rem;
+            }
+
+            .copyright {
+                color: #ffffff;
+                font-size: 0.9rem;
+                opacity: 0.7;
+                position: fixed;
+                bottom: 10px;
+                left: 0;
+                width: 100%;
+                text-align: center;
+                z-index: 100;
+                pointer-events: none;
+                user-select: none;
+            }
+
+            .game-stats {
+                display: flex;
+                justify-content: space-between;
+                margin-bottom: 20px;
+                padding: 15px;
+                background: linear-gradient(45deg, #f7fafc, #edf2f7);
+                border-radius: 12px;
+                border: 2px solid #e2e8f0;
+            }
+
+            .stat-item {
+                text-align: center;
+            }
+
+            .stat-label {
+                font-size: 0.9rem;
+                color: #718096;
+                margin-bottom: 5px;
+            }
+
+            .stat-value {
+                font-size: 1.2rem;
+                font-weight: bold;
+                color: #2d3748;
+            }
+
+            .progress-container {
+                margin: 20px 0;
+            }
+
+            .progress-bar {
+                width: 100%;
+                height: 8px;
+                background-color: #e2e8f0;
+                border-radius: 4px;
+                overflow: hidden;
+                margin-bottom: 10px;
+            }
+
+            .progress-fill {
+                height: 100%;
+                background: linear-gradient(90deg, #48bb78, #38a169);
+                border-radius: 4px;
+                transition: width 0.1s linear;
+                width: 0%;
+            }
+
+            .progress-fill.warning {
+                background: linear-gradient(90deg, #ed8936, #dd6b20);
+            }
+
+            .progress-fill.danger {
+                background: linear-gradient(90deg, #e53e3e, #c53030);
+            }
+
+            .countdown-timer {
+                font-size: 1.1rem;
+                font-weight: bold;
+                color: #4a5568;
+            }
+
+            .countdown-timer.warning {
+                color: #ed8936;
+            }
+
+            .countdown-timer.danger {
+                color: #e53e3e;
+                animation: pulse 0.5s infinite alternate;
+            }
+
+            @keyframes pulse {
+                from {
+                    opacity: 1;
+                }
+                to {
+                    opacity: 0.5;
+                }
+            }
+
+            .current-number {
+                font-size: 4rem;
+                font-weight: bold;
+                color: #2d3748;
+                margin: 30px 0;
+                min-height: 80px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                background: linear-gradient(45deg, #f7fafc, #edf2f7);
+                border-radius: 15px;
+                border: 3px solid #e2e8f0;
+                transition: all 0.3s ease;
+            }
+
+            .current-number.highlight {
+                background: linear-gradient(45deg, #fef5e7, #fed7aa);
+                border-color: #ed8936;
+                transform: scale(1.05);
+            }
+
+            .choices-container {
+                display: flex;
+                gap: 15px;
+                justify-content: center;
+                margin: 30px 0;
+                flex-wrap: wrap;
+            }
+
+            .choice-btn {
+                padding: 15px 25px;
+                font-size: 1.5rem;
+                font-weight: bold;
+                cursor: pointer;
+                background: linear-gradient(45deg, #48bb78, #38a169);
+                color: white;
+                border: none;
+                border-radius: 12px;
+                transition: all 0.3s ease;
+                min-width: 80px;
+                box-shadow: 0 4px 15px rgba(72, 187, 120, 0.3);
+            }
+
+            .choice-btn:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 6px 20px rgba(72, 187, 120, 0.4);
+                background: linear-gradient(45deg, #38a169, #2f855a);
+            }
+
+            .choice-btn:active {
+                transform: translateY(0);
+            }
+
+            .choice-btn.disabled {
+                opacity: 0.6;
+                cursor: not-allowed;
+                transform: none;
+            }
+
+            .message {
+                margin: 20px 0;
+                font-size: 1.3rem;
+                font-weight: 600;
+                min-height: 30px;
+            }
+
+            .message.success {
+                color: #38a169;
+            }
+
+            .message.error {
+                color: #e53e3e;
+            }
+
+            .message.info {
+                color: #3182ce;
+            }
+
+            .score {
+                font-size: 1.5rem;
+                font-weight: bold;
+                color: #4a5568;
+                margin-top: 20px;
+            }
+
+            .reset-btn {
+                padding: 12px 30px;
+                font-size: 1.1rem;
+                cursor: pointer;
+                background: linear-gradient(45deg, #ed8936, #dd6b20);
+                color: white;
+                border: none;
+                border-radius: 10px;
+                transition: all 0.3s ease;
+                margin-top: 10px;
+            }
+
+            .reset-btn:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 6px 20px rgba(237, 137, 54, 0.4);
+            }
+
+            .save-btn {
+                padding: 12px 30px;
+                font-size: 1.1rem;
+                cursor: pointer;
+                background: linear-gradient(45deg, #48bb78, #38a169);
+                color: white;
+                border: none;
+                border-radius: 10px;
+                transition: all 0.3s ease;
+                margin-top: 10px;
+            }
+
+            .save-btn:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 6px 20px rgba(72, 187, 120, 0.4);
+            }
+
+            .game-over-buttons {
+                display: flex;
+                gap: 15px;
+                justify-content: center;
+                margin-top: 20px;
+                flex-wrap: wrap;
+            }
+
+            .settings-panel {
+                margin-top: 20px;
+                padding: 15px;
+                background: #f7fafc;
+                border-radius: 10px;
+                border: 1px solid #e2e8f0;
+            }
+
+            .settings-row {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 10px;
+            }
+
+            .settings-row:last-child {
+                margin-bottom: 0;
+            }
+
+            .settings-label {
+                font-size: 0.9rem;
+                color: #4a5568;
+            }
+
+            .settings-input {
+                width: 60px;
+                padding: 5px;
+                border: 1px solid #cbd5e0;
+                border-radius: 4px;
+                text-align: center;
+            }
+
+            /* Modal Styles for name input */
+            .modal {
+                display: none;
+                position: fixed;
+                z-index: 1000;
+                left: 0;
+                top: 0;
+                width: 100%;
+                height: 100%;
+                background-color: rgba(0, 0, 0, 0.5);
+                backdrop-filter: blur(5px);
+            }
+
+            .modal-content {
+                background-color: white;
+                margin: 10% auto;
+                padding: 30px;
+                border-radius: 20px;
+                width: 90%;
+                max-width: 400px;
+                box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+                animation: modalSlideIn 0.3s ease-out;
+            }
+
+            @keyframes modalSlideIn {
+                from {
+                    opacity: 0;
+                    transform: translateY(-50px);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+
+            .modal-header {
+                text-align: center;
+                margin-bottom: 20px;
+            }
+
+            .modal-title {
+                font-size: 1.5rem;
+                color: #4a5568;
+                margin-bottom: 10px;
+            }
+
+            .modal-subtitle {
+                color: #718096;
+                font-size: 1rem;
+            }
+
+            .form-group {
+                margin-bottom: 20px;
+            }
+
+            .form-label {
+                display: block;
+                margin-bottom: 8px;
+                color: #4a5568;
+                font-weight: 600;
+            }
+
+            .form-input {
+                width: 100%;
+                padding: 12px;
+                border: 2px solid #e2e8f0;
+                border-radius: 8px;
+                font-size: 1rem;
+                transition: border-color 0.3s ease;
+            }
+
+            .form-input:focus {
+                outline: none;
+                border-color: #48bb78;
+            }
+
+            .modal-buttons {
+                display: flex;
+                gap: 10px;
+                justify-content: center;
+            }
+
+            .modal-btn {
+                padding: 12px 24px;
+                border: none;
+                border-radius: 8px;
+                font-size: 1rem;
+                font-weight: 600;
+                cursor: pointer;
+                transition: all 0.3s ease;
+                position: relative;
+                min-width: 120px;
+            }
+
+            .modal-btn:disabled {
+                opacity: 0.6;
+                cursor: not-allowed;
+                transform: none !important;
+            }
+
+            .modal-btn.primary {
+                background: linear-gradient(45deg, #48bb78, #38a169);
+                color: white;
+            }
+
+            .modal-btn.primary:hover:not(:disabled) {
+                background: linear-gradient(45deg, #38a169, #2f855a);
+                transform: translateY(-2px);
+            }
+
+            .modal-btn.secondary {
+                background: #e2e8f0;
+                color: #4a5568;
+            }
+
+            .modal-btn.secondary:hover:not(:disabled) {
+                background: #cbd5e0;
+                transform: translateY(-2px);
+            }
+
+            /* Loading spinner */
+            .loading-spinner {
+                display: inline-block;
+                width: 16px;
+                height: 16px;
+                border: 2px solid rgba(255, 255, 255, 0.3);
+                border-radius: 50%;
+                border-top-color: white;
+                animation: spin 1s ease-in-out infinite;
+                margin-right: 8px;
+            }
+
+            @keyframes spin {
+                to {
+                    transform: rotate(360deg);
+                }
+            }
+
+            /* Leaderboard Styles */
+            .leaderboard {
+                margin-top: 20px;
+                padding: 20px;
+                background: #f7fafc;
+                border-radius: 12px;
+                border: 1px solid #e2e8f0;
+            }
+
+            .leaderboard-title {
+                font-size: 1.3rem;
+                font-weight: bold;
+                color: #4a5568;
+                margin-bottom: 15px;
+                text-align: center;
+            }
+
+            .leaderboard-item {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 10px 15px;
+                margin-bottom: 8px;
+                background: white;
+                border-radius: 8px;
+                border: 1px solid #e2e8f0;
+                transition: all 0.3s ease;
+            }
+
+            .leaderboard-item:hover {
+                transform: translateX(5px);
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            }
+
+            .leaderboard-item.current-user {
+                background: linear-gradient(45deg, #fef5e7, #fed7aa);
+                border-color: #ed8936;
+            }
+
+            .leaderboard-rank {
+                font-weight: bold;
+                color: #4a5568;
+                min-width: 30px;
+            }
+
+            .leaderboard-rank.top-3 {
+                color: #ed8936;
+            }
+
+            .leaderboard-name {
+                flex: 1;
+                text-align: left;
+                margin-left: 15px;
+                color: #2d3748;
+            }
+
+            .leaderboard-score {
+                font-weight: bold;
+                color: #48bb78;
+            }
+
+            .loading {
+                text-align: center;
+                color: #718096;
+                font-style: italic;
+            }
+
+            .error-message {
+                color: #e53e3e;
+                text-align: center;
+                margin-top: 10px;
+            }
+
+            @media (max-width: 480px) {
+                .game-container {
+                    padding: 20px;
+                }
+
+                h1 {
+                    font-size: 2rem;
+                }
+
+                .current-number {
+                    font-size: 3rem;
+                }
+
+                .choice-btn {
+                    padding: 12px 20px;
+                    font-size: 1.3rem;
+                }
+
+                .game-stats {
+                    flex-direction: column;
+                    gap: 10px;
+                }
+
+                .modal-content {
+                    margin: 5% auto;
+                    padding: 20px;
+                }
+
+                .modal-buttons {
+                    flex-direction: column;
+                }
+
+                .game-over-buttons {
+                    flex-direction: column;
+                    align-items: center;
+                }
+            }
+        </style>
+    </head>
+    <body>
+        <div class="game-container">
+            <h2 style="margin-bottom: 12px">🏆 Memory Number Game 🏆</h2>
+            <p class="game-description">
+                Nhớ số hiện tại và chọn số của vòng trước!
+            </p>
+            <div
+                class="stat-item"
+                style="
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                "
+            >
+                <div class="stat-label" style="text-align: center">Điểm</div>
+                <div
+                    class="stat-value"
+                    id="scoreDisplay"
+                    style="text-align: center"
+                >
+                    0
+                </div>
+            </div>
+
+            <div class="progress-container">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+            </div>
+
+            <div class="current-number" id="currentNumber">?</div>
+
+            <div class="choices-container" id="choicesContainer"></div>
+
+            <div class="message" id="message"></div>
+
+            <div class="leaderboard" id="leaderboard" style="display: none">
+                <div class="leaderboard-title">Bảng xếp hạng</div>
+                <div id="leaderboardContent"></div>
+            </div>
+        </div>
+        <i class="copyright"> © From Truyền Lê with Grok & Cursor</i>
+
+        <!-- Modal for name input when saving score -->
+        <div id="nameInputModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <div class="modal-title">⛳ Lưu điểm</div>
+                    <div class="modal-subtitle">
+                        Nhập tên để lưu điểm <span id="finalScore">0</span> của
+                        bạn!
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="userName"
+                        >Tên của bạn:</label
+                    >
+                    <input
+                        type="text"
+                        id="userName"
+                        class="form-input"
+                        placeholder="Nhập tên của bạn..."
+                        maxlength="20"
+                    />
+                </div>
+                <div class="modal-buttons">
+                    <button
+                        class="modal-btn primary"
+                        id="saveScoreBtn"
+                        onclick="game.saveScore()"
+                    >
+                        ⛳ Lưu điểm
+                    </button>
+                    <button
+                        class="modal-btn secondary"
+                        onclick="game.closeNameModal()"
+                    >
+                        ❌ Hủy
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            class EnhancedMemoryGame {
+                constructor() {
+                    this.currentNumber = null;
+                    this.previousNumber = null;
+                    this.score = 0;
+                    this.round = 0;
+                    this.isGameActive = true;
+                    this.gameStartTime = null;
+                    this.currentTimer = null;
+                    this.progressTimer = null;
+                    this.memoryTime = 3;
+                    this.answerTime = 5;
+                    this.apiUrl =
+                        "https://temp-game-f1fuepgef-truyenle1s-projects-5e10f5ac.vercel.app/api/score";
+
+                    this.elements = {
+                        currentNumber: document.getElementById("currentNumber"),
+                        choicesContainer:
+                            document.getElementById("choicesContainer"),
+                        message: document.getElementById("message"),
+                        scoreDisplay: document.getElementById("scoreDisplay"),
+                        progressFill: document.getElementById("progressFill"),
+                        nameInputModal:
+                            document.getElementById("nameInputModal"),
+                        finalScore: document.getElementById("finalScore"),
+                        userName: document.getElementById("userName"),
+                        leaderboard: document.getElementById("leaderboard"),
+                        leaderboardContent:
+                            document.getElementById("leaderboardContent"),
+                        saveScoreBtn: document.getElementById("saveScoreBtn"),
+                    };
+                    this.init();
+                }
+
+                init() {
+                    this.startRound();
+                }
+
+                generateRandomNumber() {
+                    return Math.floor(Math.random() * 10) + 1;
+                }
+
+                generateChoices(correctNumber) {
+                    const choices = new Set([correctNumber]);
+
+                    while (choices.size < 3) {
+                        choices.add(this.generateRandomNumber());
+                    }
+
+                    return Array.from(choices).sort(() => Math.random() - 0.5);
+                }
+
+                showMessage(text, type = "info") {
+                    this.elements.message.textContent = text;
+                    this.elements.message.className = `message ${type}`;
+                }
+
+                clearMessage() {
+                    this.elements.message.textContent = "";
+                    this.elements.message.className = "message";
+                }
+
+                updateStats() {
+                    this.elements.scoreDisplay.textContent = this.score;
+                }
+
+                startCountdown(duration, onComplete, onTick) {
+                    if (this.currentTimer) {
+                        clearInterval(this.currentTimer);
+                    }
+                    if (this.progressTimer) {
+                        clearInterval(this.progressTimer);
+                    }
+
+                    const startTime = Date.now();
+                    const totalDuration = duration * 1000; // Convert to milliseconds
+
+                    // Update countdown display every second
+                    this.currentTimer = setInterval(() => {
+                        const elapsed = Date.now() - startTime;
+                        const timeLeft = Math.max(
+                            0,
+                            Math.ceil((totalDuration - elapsed) / 1000)
+                        );
+
+                        // Update progress bar color based on time left
+                        if (timeLeft <= 1) {
+                            this.elements.progressFill.className =
+                                "progress-fill danger";
+                        } else if (timeLeft <= duration * 0.3) {
+                            this.elements.progressFill.className =
+                                "progress-fill warning";
+                        } else {
+                            this.elements.progressFill.className =
+                                "progress-fill";
+                        }
+
+                        if (onTick) onTick(timeLeft);
+
+                        if (timeLeft <= 0) {
+                            clearInterval(this.currentTimer);
+                            if (onComplete) onComplete();
+                        }
+                    }, 1000);
+
+                    // Update progress bar smoothly every 50ms
+                    this.progressTimer = setInterval(() => {
+                        const elapsed = Date.now() - startTime;
+                        const progress = Math.min(
+                            100,
+                            (elapsed / totalDuration) * 100
+                        );
+                        this.elements.progressFill.style.width = `${progress}%`;
+
+                        if (elapsed >= totalDuration) {
+                            clearInterval(this.progressTimer);
+                            this.elements.progressFill.style.width = "100%";
+                        }
+                    }, 50);
+                }
+
+                createChoiceButton(number) {
+                    const button = document.createElement("button");
+                    button.className = "choice-btn";
+                    button.textContent = number;
+                    button.onclick = () => this.checkAnswer(number);
+                    return button;
+                }
+
+                startRound() {
+                    if (!this.isGameActive) return;
+
+                    this.round++;
+                    this.previousNumber = this.currentNumber;
+                    this.currentNumber = this.generateRandomNumber();
+
+                    this.elements.currentNumber.textContent =
+                        this.currentNumber;
+                    this.elements.choicesContainer.innerHTML = "";
+                    this.updateStats();
+
+                    if (this.round === 1) {
+                        this.gameStartTime = Date.now();
+                        this.elements.currentNumber.classList.add("highlight");
+                        this.showMessage(
+                            "Hãy nhớ số này cho vòng tiếp theo!",
+                            "info"
+                        );
+
+                        this.startCountdown(this.memoryTime, () => {
+                            this.elements.currentNumber.classList.remove(
+                                "highlight"
+                            );
+                            this.startRound();
+                        });
+                        return;
+                    }
+
+                    const choices = this.generateChoices(this.previousNumber);
+                    choices.forEach((number) => {
+                        const button = this.createChoiceButton(number);
+                        this.elements.choicesContainer.appendChild(button);
+                    });
+
+                    this.startCountdown(this.answerTime, () => {
+                        this.timeUp();
+                    });
+                }
+
+                checkAnswer(selectedNumber) {
+                    if (!this.isGameActive) return;
+
+                    // Clear the countdown timers
+                    if (this.currentTimer) {
+                        clearInterval(this.currentTimer);
+                    }
+                    if (this.progressTimer) {
+                        clearInterval(this.progressTimer);
+                    }
+
+                    // Disable all buttons
+                    const buttons =
+                        this.elements.choicesContainer.querySelectorAll(
+                            ".choice-btn"
+                        );
+                    buttons.forEach((btn) => btn.classList.add("disabled"));
+
+                    if (selectedNumber === this.previousNumber) {
+                        this.score++;
+                        this.showMessage(
+                            "🎉 Đúng rồi! Hãy nhớ số mới.",
+                            "success"
+                        );
+                        this.updateStats();
+
+                        setTimeout(() => {
+                            this.clearMessage();
+                            this.startRound();
+                        }, 200);
+                    } else {
+                        this.endGame();
+                    }
+                }
+
+                timeUp() {
+                    if (!this.isGameActive) return;
+                    this.endGame();
+                }
+
+                endGame() {
+                    this.isGameActive = false;
+                    this.showMessage(
+                        `❌ Game over! Điểm của bạn: ${this.score}`,
+                        "error"
+                    );
+
+                    // Show game over buttons based on score
+                    let buttonsHTML = '<div class="game-over-buttons">';
+
+                    // Only show save button if score is 10 or higher
+                    if (this.score >= 5) {
+                        buttonsHTML += `
+                            <button class="save-btn" onclick="game.showNameInput()">
+                                ⛳ Lưu điểm
+                            </button>
+                        `;
+                    }
+
+                    buttonsHTML += `
+                        <button class="reset-btn" onclick="game.resetGame()">
+                            🔄 Chơi lại
+                        </button>
+                    </div>`;
+
+                    this.elements.choicesContainer.innerHTML = buttonsHTML;
+                }
+
+                showNameInput() {
+                    this.elements.finalScore.textContent = this.score;
+                    this.elements.nameInputModal.style.display = "block";
+                    this.elements.userName.focus();
+                }
+
+                closeNameModal() {
+                    this.elements.nameInputModal.style.display = "none";
+                    this.elements.userName.value = "";
+                    this.resetSaveButton();
+                }
+
+                setSaveButtonLoading(isLoading) {
+                    const btn = this.elements.saveScoreBtn;
+                    if (isLoading) {
+                        btn.disabled = true;
+                        btn.innerHTML =
+                            '<span class="loading-spinner"></span>Đang lưu...';
+                    } else {
+                        btn.disabled = false;
+                        btn.innerHTML = "⛳ Lưu điểm";
+                    }
+                }
+
+                resetSaveButton() {
+                    this.setSaveButtonLoading(false);
+                }
+
+                async saveScore() {
+                    const userName = this.elements.userName.value.trim();
+
+                    if (!userName) {
+                        alert("Vui lòng nhập tên của bạn!");
+                        return;
+                    }
+
+                    // Set loading state
+                    this.setSaveButtonLoading(true);
+                    this.showMessage("Đang lưu điểm...", "info");
+
+                    try {
+                        const response = await fetch(this.apiUrl, {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json",
+                            },
+                            body: JSON.stringify({
+                                user_name: userName,
+                                score: this.score,
+                            }),
+                        });
+
+                        if (!response.ok) {
+                            throw new Error(
+                                `HTTP error! status: ${response.status}`
+                            );
+                        }
+
+                        const data = await response.json();
+
+                        this.showMessage(
+                            "✅ Điểm đã được lưu thành công!",
+                            "success"
+                        );
+                        this.closeNameModal();
+                        this.displayLeaderboard(
+                            data.data.leaderboard || [],
+                            data.data.newUser.user_name
+                        );
+
+                        // Update buttons after saving
+                        this.elements.choicesContainer.innerHTML = `
+                            <div class="game-over-buttons">
+                                <button class="reset-btn" onclick="game.resetGame()">
+                                    🔄 Chơi lại
+                                </button>
+                            </div>
+                        `;
+                    } catch (error) {
+                        console.error("Error saving score:", error);
+                        this.showMessage(
+                            "❌ Lỗi khi lưu điểm. Vui lòng thử lại!",
+                            "error"
+                        );
+                    } finally {
+                        // Reset loading state
+                        this.setSaveButtonLoading(false);
+                    }
+                }
+
+                displayLeaderboard(leaderboard, newUserName) {
+                    if (!leaderboard || leaderboard.length === 0) {
+                        this.elements.leaderboardContent.innerHTML =
+                            '<div class="loading">Không có dữ liệu bảng xếp hạng</div>';
+                        this.elements.leaderboard.style.display = "block";
+                        return;
+                    }
+
+                    let leaderboardHTML = "";
+                    leaderboard.forEach((player, index) => {
+                        const rank = index + 1;
+                        const rankClass = rank <= 3 ? "top-3" : "";
+                        const rankIcon =
+                            index === 0
+                                ? "🏆"
+                                : index === 1
+                                ? "🥈"
+                                : index === 2
+                                ? "🥉"
+                                : "";
+                        const isCurrentUser = player.user_name === newUserName;
+                        const itemClass = isCurrentUser
+                            ? "leaderboard-item current-user"
+                            : "leaderboard-item";
+
+                        leaderboardHTML += `
+                        <div class="${itemClass}">
+                            <div class="leaderboard-rank ${rankClass}">#${rank}${rankIcon}</div>
+                            <div class="leaderboard-name">${player.user_name}</div>
+                            <div class="leaderboard-score">${player.score} điểm</div>
+                        </div>
+                    `;
+                    });
+
+                    this.elements.leaderboardContent.innerHTML =
+                        leaderboardHTML;
+                    this.elements.leaderboard.style.display = "block";
+                }
+
+                resetGame() {
+                    this.score = 0;
+                    this.round = 0;
+                    this.currentNumber = null;
+                    this.previousNumber = null;
+                    this.isGameActive = true;
+                    this.gameStartTime = null;
+
+                    if (this.currentTimer) {
+                        clearInterval(this.currentTimer);
+                    }
+                    if (this.progressTimer) {
+                        clearInterval(this.progressTimer);
+                    }
+
+                    this.elements.progressFill.style.width = "0%";
+                    this.elements.progressFill.className = "progress-fill";
+                    this.elements.currentNumber.classList.remove("highlight");
+                    this.elements.leaderboard.style.display = "none";
+
+                    this.updateStats();
+                    this.clearMessage();
+                    this.startRound();
+                }
+            }
+
+            // Khởi tạo game
+            const game = new EnhancedMemoryGame();
+
+            // Handle Enter key in username input
+            document
+                .getElementById("userName")
+                .addEventListener("keypress", function (e) {
+                    if (e.key === "Enter") {
+                        game.saveScore();
+                    }
+                });
+
+            // Chặn bounce effect trên iOS
+            document.addEventListener(
+                "touchmove",
+                function (e) {
+                    if (
+                        e.target.closest(".modal") ||
+                        e.target.closest(".game-container")
+                    ) {
+                        return;
+                    }
+                    e.preventDefault();
+                },
+                { passive: false }
+            );
+
+            // Chặn zoom trên iOS
+            document.addEventListener("gesturestart", function (e) {
+                e.preventDefault();
+            });
+        </script>
+    </body>
+</html>
