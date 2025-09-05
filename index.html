@@ -36,7 +36,7 @@
             .game-container {
                 text-align: center;
                 background: rgba(255, 255, 255, 0.95);
-                padding: 32px 40px;
+                padding: 32px 24px;
                 padding-top: 48px;
                 padding-bottom: 48px;
                 border-radius: 20px;
@@ -1158,7 +1158,7 @@
                         this.closeNameModal();
                         this.displayLeaderboard(
                             data?.leaderboard ?? [],
-                            data?.user?.user_name ?? ""
+                            data?.data?.user?.user_name ?? ""
                         );
 
                         // Update buttons after saving
