@@ -85,7 +85,6 @@
             .stat-label {
                 font-size: 0.9rem;
                 color: #718096;
-                margin-bottom: 5px;
             }
 
             .stat-value {
@@ -210,6 +209,13 @@
                 margin: 20px 0;
                 font-size: 1.3rem;
                 font-weight: 600;
+                min-height: 30px;
+            }
+
+            .message2 {
+                margin: 20px 0;
+                font-size: 0.9rem;
+                font-weight: 400;
                 min-height: 30px;
             }
 
@@ -734,18 +740,20 @@
                 class="stat-item"
                 style="
                     display: flex;
-                    flex-direction: column;
+                    flex-direction: row;
                     align-items: center;
+                    justify-content: center;
+                    gap: 8px;
                 "
             >
-                <div class="stat-label" style="text-align: center">Điểm</div>
-                <div
+                <span class="stat-label" style="text-align: center">Điểm:</span>
+                <span
                     class="stat-value"
                     id="scoreDisplay"
                     style="text-align: center"
                 >
                     0
-                </div>
+                </span>
             </div>
 
             <div class="progress-container">
@@ -759,6 +767,7 @@
             <div class="choices-container" id="choicesContainer"></div>
 
             <div class="message" id="message"></div>
+            <div class="message2" id="message2"></div>
 
             <div class="leaderboard" id="leaderboard" style="display: none">
                 <div class="leaderboard-title">Bảng xếp hạng</div>
@@ -955,6 +964,8 @@
                 startRound() {
                     if (!this.isGameActive) return;
 
+                    document.getElementById("message2").textContent = "";
+
                     this.round++;
                     this.previousNumber = this.currentNumber;
                     this.currentNumber = this.generateRandomNumber();
@@ -1023,7 +1034,7 @@
                             this.startRound();
                         }, 200);
                     } else {
-                        this.endGame();
+                        this.endGame(selectedNumber);
                     }
                 }
 
@@ -1032,17 +1043,26 @@
                     this.endGame();
                 }
 
-                endGame() {
+                endGame(selectedNumber) {
                     this.isGameActive = false;
                     this.showMessage(
                         `❌ Game over! Điểm của bạn: ${this.score}`,
                         "error"
                     );
 
+                    if (typeof selectedNumber === "number") {
+                        document.getElementById(
+                            "message2"
+                        ).textContent = `✅ Số chính xác: ${this.previousNumber}. ❌ Số bạn chọn: ${selectedNumber}`;
+                    } else {
+                        document.getElementById("message2").textContent =
+                            "⌛ Hết thời gian";
+                    }
+
                     // Show game over buttons based on score
                     let buttonsHTML = '<div class="game-over-buttons">';
 
-                    // Only show save button if score is 10 or higher
+                    // Only show save button if score is 5 or higher
                     if (this.score >= 5) {
                         buttonsHTML += `
                             <button class="save-btn" onclick="game.showNameInput()">
@@ -1137,8 +1157,8 @@
                         );
                         this.closeNameModal();
                         this.displayLeaderboard(
-                            data.data.leaderboard || [],
-                            data.data.newUser.user_name
+                            data?.leaderboard ?? [],
+                            data?.user?.user_name ?? ""
                         );
 
                         // Update buttons after saving
