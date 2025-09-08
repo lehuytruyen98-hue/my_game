@@ -4,12 +4,10 @@
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>Memory Game</title>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-        <link
-            href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@100;200;300;400;500;600;700;800;900&display=swap"
-            rel="stylesheet"
-        />
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@100;200;300;400;500;600;700;800;900<title>Memory Game</title>display=swap" rel="stylesheet">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link rel="stylesheet" href="./styles.css" />
     </head>
     <body>
@@ -50,12 +48,12 @@
                         </div>
                     </div>
                     <div class="guide-tip">
-                        💡 <strong>Mẹo: </strong>Sử dụng trí nhớ ngắn hạn, tập
+                        💡 <strong>Mẹo:</strong>Sử dụng trí nhớ ngắn hạn, tập
                         trung và chọn chính xác biểu tượng của mỗi vòng!
                     </div>
                 </div>
                 <button class="start-game-btn" onclick="game.startFirstGame()">
-                    Bắt đầu chơi
+                    🚀 Bắt đầu chơi
                 </button>
             </div>
         </div>
@@ -94,7 +92,7 @@
             <div class="choices-container" id="choicesContainer"></div>
 
             <div class="message" id="message"></div>
-            <div class="message2" id="message2" style="text-align: left"></div>
+            <div class="message2" id="message2"></div>
 
             <div class="leaderboard" id="leaderboard" style="display: none">
                 <div class="leaderboard-title">Bảng xếp hạng</div>
