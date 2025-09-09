@@ -275,15 +275,15 @@ class EnhancedMemoryGame {
         );
 
         this.elements.choicesContainer.innerHTML = `
-        <div class="game-over-buttons">
-        <button class="save-btn" onclick="game.showNameInput()">
-            ⛳ Lưu điểm
-        </button>
-        <button class="reset-btn" onclick="game.resetGame()">
-        🔄 Chơi lại
-    </button>
-</div>
-    `;
+            <div class="game-over-buttons">
+                <button class="save-btn" onclick="game.showNameInput()">
+                    ⛳ Lưu điểm
+                </button>
+                <button class="reset-btn" onclick="game.resetGame()">
+                    🔄 Chơi lại
+                </button>
+            </div>
+        `;
     }
 
     showNameInput() {
