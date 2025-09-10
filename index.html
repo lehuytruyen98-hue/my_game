@@ -102,26 +102,27 @@
             </div>
         </div>
 
-        <!-- Modal for name input when saving score -->
+        <!-- Modal for phone number input when saving score -->
         <div id="nameInputModal" class="modal">
             <div class="modal-content">
                 <div class="modal-header">
                     <div class="modal-title">⛳ Lưu điểm</div>
                     <div class="modal-subtitle">
-                        Nhập tên để lưu điểm <span id="finalScore">0</span> của
-                        bạn!
+                        Nhập số điện thoại để lưu điểm
+                        <span id="finalScore">0</span> của bạn!
                     </div>
                 </div>
                 <div class="form-group">
                     <label class="form-label" for="userName"
-                        >Tên của bạn:</label
+                        >Số điện thoại của bạn:</label
                     >
                     <input
-                        type="text"
+                        type="tel"
                         id="userName"
                         class="form-input"
-                        placeholder="Nhập tên của bạn..."
-                        maxlength="20"
+                        placeholder="Nhập số điện thoại của bạn..."
+                        maxlength="11"
+                        pattern="[0-9]{10,11}"
                     />
                 </div>
                 <div class="modal-buttons">

@@ -12,8 +12,9 @@ class EnhancedMemoryGame {
         this.progressTimer = null;
         this.memoryTime = 3;
         this.answerTime = 5;
+        this.numberOfChoices = 3;
         this.apiUrl =
-            "https://temp-game-qify8bl52-truyenle1s-projects-5e10f5ac.vercel.app/api/score";
+            "https://temp-game-txsj2qd6v-truyenle1s-projects-5e10f5ac.vercel.app/api/score";
         this.isFirstTime = true; // Thêm flag để kiểm tra lần đầu
 
         this.elements = {
@@ -60,7 +61,7 @@ class EnhancedMemoryGame {
     generateChoices(correctNumber) {
         const choices = new Set([correctNumber]);
 
-        while (choices.size < 3) {
+        while (choices.size < this.numberOfChoices) {
             choices.add(this.generateRandomNumber());
         }
 
@@ -137,7 +138,13 @@ class EnhancedMemoryGame {
         const button = document.createElement("button");
         button.className = "choice-btn";
         const { icon, name } = DATA[number]
-        button.innerHTML = `<img src="${icon}" alt="${name}" style="width:120px;height:120px;aspect-ratio:1/1;border-radius:8px;object-fit:cover;display:block;" />`;
+        if (this.round >= 11) {
+            button.innerHTML = `
+                <span style="font-size: 16px; border: 1.5px solid #e2e8f0; border-radius: 8px; padding: 8px 12px; display: inline-block;">${name}</span>
+            `;
+        } else {
+            button.innerHTML = `<img src="${icon}" alt="${name}" style="width:120px;height:120px;aspect-ratio:1/1;border-radius:8px;object-fit:cover;display:block;" />`;
+        }
         button.onclick = () => this.checkAnswer(number);
         return button;
     }
@@ -150,9 +157,24 @@ class EnhancedMemoryGame {
         this.round++;
         this.previousNumber = this.currentNumber;
         this.currentNumber = this.generateRandomNumber();
+        switch (this.round) {
+            case 4:
+            case 8:
+                this.answerTime -= 1;
+                break;
+            case 6:
+                this.numberOfChoices += 1;
+                break;
+            case 11:
+                this.answerTime += 1;
+                this.numberOfChoices -= 1;
+                break;
+
+            default:
+                break;
+        }
 
         const { icon, name, code } = DATA[this.currentNumber]
-        // 
         this.elements.currentNumber.innerHTML = `
             <div style="background:rgb(250 249 250); border: 2px solid #e2e8f0; border-radius: 8px; padding: 12px; display: flex; flex-direction: row; align-items: center; gap: 12px;">
                 <img src="${icon}" alt="${name}" style="width: 80px; height: 80px; object-fit: contain; border-radius: 8px; border: 2px solid #e2e8f0;" />
@@ -249,15 +271,8 @@ class EnhancedMemoryGame {
                 "⌛ Hết thời gian";
         }
 
-        // Show game over buttons based on score
+        // Show game over buttons - không hiện button lưu điểm khi thua
         let buttonsHTML = '<div class="game-over-buttons">';
-
-        // Only show save button if score is 5 or higher
-        buttonsHTML += `
-                <button class="save-btn" onclick="game.showNameInput()">
-                    ⛳ Lưu điểm
-                </button>
-            `;
 
         buttonsHTML += `
             <button class="reset-btn" onclick="game.resetGame()">
@@ -274,6 +289,7 @@ class EnhancedMemoryGame {
             "success"
         );
 
+        // Chỉ hiện button lưu điểm khi thắng game
         this.elements.choicesContainer.innerHTML = `
             <div class="game-over-buttons">
                 <button class="save-btn" onclick="game.showNameInput()">
@@ -289,14 +305,6 @@ class EnhancedMemoryGame {
     showNameInput() {
         this.elements.finalScore.textContent = this.score;
         this.elements.nameInputModal.style.display = "block";
-
-        // Auto-fill tên đã lưu trước đó
-        const savedName =
-            localStorage.getItem("memoryGameUserName");
-        if (savedName) {
-            this.elements.userName.value = savedName;
-        }
-
         this.elements.userName.focus();
     }
 
@@ -322,16 +330,32 @@ class EnhancedMemoryGame {
         this.setSaveButtonLoading(false);
     }
 
-    async saveScore() {
-        const userName = this.elements.userName.value.trim();
+    formatCompletionTime(completionTimeMs) {
+        const seconds = Math.floor(completionTimeMs / 1000);
+        const milliseconds = completionTimeMs % 1000;
+        return `${seconds} giây ${milliseconds}`;
+    }
 
-        if (!userName) {
-            alert("Vui lòng nhập tên của bạn!");
+    async saveScore() {
+        const phoneNumber = this.elements.userName.value.trim();
+
+        if (!phoneNumber) {
+            alert("Vui lòng nhập số điện thoại của bạn!");
             return;
         }
 
-        // Lưu tên người dùng vào localStorage
-        localStorage.setItem("memoryGameUserName", userName);
+        // Validate phone number format (basic validation)
+        const phoneRegex = /^[0-9]{10,11}$/;
+        if (!phoneRegex.test(phoneNumber)) {
+            alert("Vui lòng nhập số điện thoại hợp lệ (10-11 chữ số)!");
+            return;
+        }
+
+        // Lưu số điện thoại người dùng vào localStorage
+        localStorage.setItem("memoryGameUserPhone", phoneNumber);
+
+        // Tính thời gian hoàn thành trò chơi
+        const completionTime = Date.now() - this.gameStartTime;
 
         // Set loading state
         this.setSaveButtonLoading(true);
@@ -344,8 +368,8 @@ class EnhancedMemoryGame {
                     "Content-Type": "application/json",
                 },
                 body: JSON.stringify({
-                    user_name: userName,
-                    score: this.score,
+                    phone_number: phoneNumber,
+                    completion_time: completionTime,
                 }),
             });
 
@@ -364,7 +388,7 @@ class EnhancedMemoryGame {
             this.closeNameModal();
             this.displayLeaderboard(
                 data?.leaderboard ?? [],
-                data?.data?.user?.user_name ?? ""
+                data?.data?.user?.phone_number ?? ""
             );
 
             // Update buttons after saving
@@ -387,7 +411,7 @@ class EnhancedMemoryGame {
         }
     }
 
-    displayLeaderboard(leaderboard, newUserName) {
+    displayLeaderboard(leaderboard, newUserPhone) {
         if (!leaderboard || leaderboard.length === 0) {
             this.elements.leaderboardContent.innerHTML =
                 '<div class="loading">Không có dữ liệu bảng xếp hạng</div>';
@@ -407,7 +431,7 @@ class EnhancedMemoryGame {
                         : index === 2
                             ? "🥉"
                             : "";
-            const isCurrentUser = player.user_name === newUserName;
+            const isCurrentUser = player.phone_number === newUserPhone;
             const itemClass = isCurrentUser
                 ? "leaderboard-item current-user"
                 : "leaderboard-item";
@@ -415,8 +439,8 @@ class EnhancedMemoryGame {
             leaderboardHTML += `
             <div class="${itemClass}">
                 <div class="leaderboard-rank ${rankClass}">#${rank}${rankIcon}</div>
-                <div class="leaderboard-name">${player.user_name}</div>
-                <div class="leaderboard-score">${player.score} điểm</div>
+                <div class="leaderboard-name">${player.phone_number}</div>
+                <div class="leaderboard-time">${this.formatCompletionTime(player.completion_time)}</div>
             </div>
         `;
         });
@@ -433,6 +457,8 @@ class EnhancedMemoryGame {
         this.previousNumber = null;
         this.isGameActive = true;
         this.gameStartTime = null;
+        this.numberOfChoices = 3;
+        this.answerTime = 5;
 
         if (this.currentTimer) {
             clearInterval(this.currentTimer);
@@ -456,7 +482,7 @@ class EnhancedMemoryGame {
 const game = new EnhancedMemoryGame();
 window.game = game;
 
-// Handle Enter key in username input
+// Handle Enter key in phone number input
 document
     .getElementById("userName")
     .addEventListener("keypress", function (e) {

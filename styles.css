@@ -535,9 +535,12 @@ h1 {
     color: #2d3748;
 }
 
-.leaderboard-score {
+.leaderboard-time {
     font-weight: bold;
-    color: #48bb78;
+    color: #48bb78 !important;
+    font-size: 0.9rem;
+    text-align: right;
+    min-width: 80px;
 }
 
 .loading {
