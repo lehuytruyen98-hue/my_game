@@ -22,10 +22,9 @@
                         <div class="guide-step">
                             <span class="step-number">1</span>
                             <span class="step-text"
-                                >Mỗi vòng, một biểu tượng dịch vụ sẽ hiện ra.
-                                Bạn cần
+                                >Mỗi vòng, một dịch vụ sẽ hiện ra. Bạn cần
                                 <b
-                                    ><u><i>ghi nhớ biểu tượng này</i></u></b
+                                    ><u><i>ghi nhớ dịch vụ này</i></u></b
                                 >
                                 để sử dụng ở vòng tiếp theo.</span
                             >
@@ -35,9 +34,10 @@
                             <span class="step-text"
                                 >Từ vòng thứ hai, nhiệm vụ của bạn là
                                 <u
-                                    ><b><i>chọn đúng biểu tượng</i></b></u
+                                    ><b><i>chọn đúng dịch vụ</i></b></u
                                 >
-                                đã xuất hiện ở vòng trước đó.</span
+                                đã xuất hiện ở vòng trước đó. Và tiếp tục ghi
+                                nhớ dịch vụ xuất hiện cho vòng tiếp theo.</span
                             >
                         </div>
                         <div class="guide-step">
@@ -51,7 +51,8 @@
                     </div>
                     <div class="guide-tip">
                         💡 <strong>Mẹo: </strong>Sử dụng trí nhớ ngắn hạn, tập
-                        trung và chọn chính xác biểu tượng của mỗi vòng!
+                        trung và chọn chính xác biểu tượng/tên/code của mỗi
+                        vòng!
                     </div>
                 </div>
                 <button class="start-game-btn" onclick="game.startFirstGame()">
@@ -108,7 +109,7 @@
                 <div class="modal-header">
                     <div class="modal-title">⛳ Lưu điểm</div>
                     <div class="modal-subtitle">
-                        Nhập số điện thoại để lưu điểm
+                        Nhập tên và số điện thoại để lưu điểm
                         <span id="finalScore">0</span> của bạn!
                     </div>
                 </div>
@@ -123,6 +124,19 @@
                         placeholder="Nhập số điện thoại của bạn..."
                         maxlength="11"
                         pattern="[0-9]{10,11}"
+                    />
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="userFullName"
+                        >Domain bạn:</label
+                    >
+                    <input
+                        type="text"
+                        id="userFullName"
+                        class="form-input"
+                        placeholder="Nhập domain của bạn..."
+                        maxlength="30"
+                        autocomplete="off"
                     />
                 </div>
                 <div class="modal-buttons">
