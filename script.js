@@ -13,9 +13,6 @@ class EnhancedMemoryGame {
         this.memoryTime = 3;
         this.answerTime = 5;
         this.numberOfChoices = 3;
-        this.apiUrl =
-            "https://temp-game-ly7ds9ua2-truyenle1s-projects-5e10f5ac.vercel.app/api/score";
-        this.isFirstTime = true; // Thêm flag để kiểm tra lần đầu
 
         this.elements = {
             welcomeScreen: document.getElementById("welcomeScreen"),
@@ -26,14 +23,7 @@ class EnhancedMemoryGame {
             message: document.getElementById("message"),
             scoreDisplay: document.getElementById("scoreDisplay"),
             progressFill: document.getElementById("progressFill"),
-            nameInputModal:
-                document.getElementById("nameInputModal"),
-            finalScore: document.getElementById("finalScore"),
-            userName: document.getElementById("userName"),
-            leaderboard: document.getElementById("leaderboard"),
-            leaderboardContent:
-                document.getElementById("leaderboardContent"),
-            saveScoreBtn: document.getElementById("saveScoreBtn"),
+            scrollingIcons: document.getElementById("scrollingIcons"),
         };
         this.init();
     }
@@ -42,13 +32,41 @@ class EnhancedMemoryGame {
         // Luôn hiện welcome screen mỗi khi reload trang
         this.elements.welcomeScreen.style.display = "flex";
         this.elements.gameContainer.style.display = "none";
+
+        // Render scrolling icons ngay lập tức
+        this.renderScrollingIcons();
+    }
+
+    renderScrollingIcons() {
+        const iconsContainer = this.elements.scrollingIcons;
+        iconsContainer.innerHTML = '';
+
+        // Tạo 2 bộ icon để tạo hiệu ứng lặp liên tục
+        for (let i = 0; i < 5; i++) {
+            Object.values(DATA)
+                .sort(() => Math.random() - 0.5)
+                .forEach(({ code, icon, name }) => {
+                    const iconElement = document.createElement('div');
+                    iconElement.className = 'scrolling-icon';
+                    iconElement.innerHTML = `
+                    <img src="${icon}" alt="${name}">
+                    <div style="flex-direction: column; min-width: 250px;">
+                        <span style="font-size: 16px;">${name}</span>
+                        <br>
+                        <span style="font-size: 12px; color: #64748b; font-weight: 400;">${code}</span>
+                    </div>
+            `;
+                    iconsContainer.appendChild(iconElement);
+                });
+        }
     }
 
     startFirstGame() {
         // Ẩn welcome screen và hiện game container
         this.elements.welcomeScreen.style.display = "none";
-        this.elements.gameContainer.style.display = "block";
-        this.isFirstTime = false;
+        this.elements.gameContainer.style = null;
+        this.elements.gameContainer.className = "game-container-wrapper";
+
 
         // Bắt đầu game
         this.startRound();
@@ -69,11 +87,13 @@ class EnhancedMemoryGame {
     }
 
     showMessage(text, type = "info") {
+        this.elements.message.style.display = "";
         this.elements.message.textContent = text;
         this.elements.message.className = `message ${type}`;
     }
 
     clearMessage() {
+        this.elements.message.style.display = "none";
         this.elements.message.textContent = "";
         this.elements.message.className = "message";
     }
@@ -164,7 +184,7 @@ class EnhancedMemoryGame {
                 break;
             case 6:
                 this.numberOfChoices += 1;
-                this.elements.choicesContainer.style.cssText = "display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; gap: 12px; justify-items: center; align-items: center; max-width: 280px; margin: 30px auto;";
+                this.elements.choicesContainer.style.cssText = "display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; gap: 12px; justify-items: center; align-items: center; max-width: 280px; margin: 12px auto;";
                 break;
             case 10:
                 this.showMessage(
@@ -191,7 +211,7 @@ class EnhancedMemoryGame {
         const { icon, name, code } = DATA[this.currentNumber]
         this.elements.currentNumber.innerHTML = `
             <div style="background:rgb(250 249 250); border: 2px solid #e2e8f0; border-radius: 8px; padding: 12px; display: flex; flex-direction: row; align-items: center; gap: 12px;">
-                <img src="${icon}" alt="${name}" style="width: 80px; height: 80px; object-fit: contain; border-radius: 8px; border: 2px solid #e2e8f0;" />
+                <img src="${icon}" alt="${name}" class="icon-serivce">
                 <div style="display: flex; flex-direction: column; gap: 4px; align-items: flex-start;">
                     <span style="font-size: 16px;">${name}</span>
                     <span style="font-size: 12px; color: #64748b; font-weight: 400;">${code}</span>
@@ -271,10 +291,17 @@ class EnhancedMemoryGame {
 
     endGame(selectedNumber) {
         this.isGameActive = false;
-        this.showMessage(
-            '❌ Game over!',
-            "error"
-        );
+        if (this.score >= 10) {
+            this.showMessage(
+                '🎉 Bạn sẽ nhận được cổ vật từ BTC',
+                "success"
+            );
+        } else {
+            this.showMessage(
+                '❌ Game over!',
+                "error"
+            );
+        }
 
         if (typeof selectedNumber === "number") {
             document.getElementById(
@@ -285,16 +312,14 @@ class EnhancedMemoryGame {
                 "⌛ Hết thời gian";
         }
 
-        // Show game over buttons - không hiện button lưu điểm khi thua
-        let buttonsHTML = '<div class="game-over-buttons">';
-
-        buttonsHTML += `
-            <button class="reset-btn" onclick="game.resetGame()">
-                🔄 Chơi lại
-            </button>
-        </div>`;
-
-        this.elements.choicesContainer.innerHTML = buttonsHTML;
+        this.elements.choicesContainer.style.cssText = ""
+        this.elements.choicesContainer.innerHTML = `
+            <div class="game-over-buttons">
+                <button class="reset-btn" onclick="game.resetGame()">
+                    🔄 Chơi lại
+                </button>
+            </div>
+        `;
     }
 
     winGame() {
@@ -304,165 +329,14 @@ class EnhancedMemoryGame {
         );
 
         // Chỉ hiện button lưu điểm khi thắng game
+        this.elements.choicesContainer.style.cssText = ""
         this.elements.choicesContainer.innerHTML = `
             <div class="game-over-buttons">
-                <button class="save-btn" onclick="game.showNameInput()">
-                    ⛳ Lưu điểm
-                </button>
                 <button class="reset-btn" onclick="game.resetGame()">
                     🔄 Chơi lại
                 </button>
             </div>
         `;
-    }
-
-    showNameInput() {
-        this.elements.finalScore.textContent = this.score;
-        this.elements.nameInputModal.style.display = "block";
-        this.elements.userName.focus();
-    }
-
-    closeNameModal() {
-        this.elements.nameInputModal.style.display = "none";
-        this.elements.userName.value = "";
-        this.resetSaveButton();
-    }
-
-    setSaveButtonLoading(isLoading) {
-        const btn = this.elements.saveScoreBtn;
-        if (isLoading) {
-            btn.disabled = true;
-            btn.innerHTML =
-                '<span class="loading-spinner"></span>Đang lưu...';
-        } else {
-            btn.disabled = false;
-            btn.innerHTML = "⛳ Lưu điểm";
-        }
-    }
-
-    resetSaveButton() {
-        this.setSaveButtonLoading(false);
-    }
-
-    formatCompletionTime(completionTimeMs) {
-        const seconds = Math.floor(completionTimeMs / 1000);
-        const milliseconds = completionTimeMs % 1000;
-        return `${seconds} giây ${milliseconds}`;
-    }
-
-    async saveScore() {
-        const phoneNumber = this.elements.userName.value.trim();
-        const userFullName = document.getElementById("userFullName").value.trim();
-
-        if (!userFullName) {
-            alert("Vui lòng nhập domain của bạn!");
-            return;
-        }
-
-        if (!phoneNumber) {
-            alert("Vui lòng nhập số điện thoại của bạn!");
-            return;
-        }
-
-        // Validate phone number format (basic validation)
-        const phoneRegex = /^[0-9]{10,11}$/;
-        if (!phoneRegex.test(phoneNumber)) {
-            alert("Vui lòng nhập số điện thoại hợp lệ (10-11 chữ số)!");
-            return;
-        }
-        // Tính thời gian hoàn thành trò chơi
-        const completionTime = Date.now() - this.gameStartTime;
-
-        // Set loading state
-        this.setSaveButtonLoading(true);
-        this.showMessage("Đang lưu điểm...", "info");
-
-        try {
-            const response = await fetch(this.apiUrl, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                    phone_number: phoneNumber,
-                    user_name: userFullName,
-                    completion_time: completionTime,
-                }),
-            });
-
-            if (!response.ok) {
-                throw new Error(
-                    `HTTP error! status: ${response.status}`
-                );
-            }
-
-            const { data, leaderboard = [] } = await response.json() ?? {};
-            const { phone_number = "" } = data ?? {};
-
-            this.showMessage(
-                "✅ Điểm đã được lưu thành công!",
-                "success"
-            );
-            this.closeNameModal();
-            this.displayLeaderboard(leaderboard, phone_number);
-
-            // Update buttons after saving
-            this.elements.choicesContainer.innerHTML = `
-                <div class="game-over-buttons">
-                    <button class="reset-btn" onclick="game.resetGame()">
-                        🔄 Chơi lại
-                    </button>
-                </div>
-            `;
-        } catch (error) {
-            console.error("Error saving score:", error);
-            this.showMessage(
-                "❌ Lỗi khi lưu điểm. Vui lòng thử lại!",
-                "error"
-            );
-        } finally {
-            // Reset loading state
-            this.setSaveButtonLoading(false);
-        }
-    }
-
-    displayLeaderboard(leaderboard, newUserPhone) {
-        if (!leaderboard || leaderboard.length === 0) {
-            this.elements.leaderboardContent.innerHTML =
-                '<div class="loading">Không có dữ liệu bảng xếp hạng</div>';
-            this.elements.leaderboard.style.display = "block";
-            return;
-        }
-
-        let leaderboardHTML = "";
-        leaderboard.forEach((player, index) => {
-            const rank = index + 1;
-            const rankClass = rank <= 3 ? "top-3" : "";
-            const rankIcon =
-                index === 0
-                    ? "🏆"
-                    : index === 1
-                        ? "🥈"
-                        : index === 2
-                            ? "🥉"
-                            : "";
-            const isCurrentUser = player.phone_number === newUserPhone;
-            const itemClass = isCurrentUser
-                ? "leaderboard-item current-user"
-                : "leaderboard-item";
-
-            leaderboardHTML += `
-            <div class="${itemClass}">
-                <div class="leaderboard-rank ${rankClass}">#${rank}${rankIcon}</div>
-                <div class="leaderboard-name">${player.phone_number} - ${player.user_name}</div>
-                <div class="leaderboard-time">${this.formatCompletionTime(player.completion_time)}</div>
-            </div>
-        `;
-        });
-
-        this.elements.leaderboardContent.innerHTML =
-            leaderboardHTML;
-        this.elements.leaderboard.style.display = "block";
     }
 
     resetGame() {
@@ -485,43 +359,14 @@ class EnhancedMemoryGame {
         this.elements.progressFill.style.width = "0%";
         this.elements.progressFill.className = "progress-fill";
         this.elements.currentNumber.classList.remove("highlight");
-        this.elements.leaderboard.style.display = "none";
 
         this.updateStats();
         this.clearMessage();
-        this.startRound();
+        this.elements.gameContainer.style.display = "none";
+        this.elements.welcomeScreen.style.display = "flex";
     }
 }
 
 // Khởi tạo game
 const game = new EnhancedMemoryGame();
 window.game = game;
-
-// Handle Enter key in phone number input
-document
-    .getElementById("userName")
-    .addEventListener("keypress", function (e) {
-        if (e.key === "Enter") {
-            game.saveScore();
-        }
-    });
-
-// Chặn bounce effect trên iOS
-document.addEventListener(
-    "touchmove",
-    function (e) {
-        if (
-            e.target.closest(".modal") ||
-            e.target.closest(".game-container")
-        ) {
-            return;
-        }
-        e.preventDefault();
-    },
-    { passive: false }
-);
-
-// Chặn zoom trên iOS
-document.addEventListener("gesturestart", function (e) {
-    e.preventDefault();
-}); 

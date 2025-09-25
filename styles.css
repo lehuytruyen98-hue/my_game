@@ -10,14 +10,11 @@ body {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    min-height: 100vh;
+    /* min-height: 100vh; */
     background: #f9b5c3;
     color: #333;
-    /* Đảm bảo background không bị dính màu trắng khi scroll */
     background-attachment: fixed;
-    /* Chặn bounce effect trên iOS */
     overscroll-behavior: none;
-    -webkit-overflow-scrolling: touch;
 }
 
 html {
@@ -29,15 +26,14 @@ html {
 .game-container {
     text-align: center;
     background: rgb(250 249 250);
-    padding: 32px 24px;
-    padding-top: 48px;
-    padding-bottom: 48px;
+    padding-top: 24px;
+    padding-left: 24px;
+    padding-right: 24px;
     border-radius: 12px;
     backdrop-filter: blur(10px);
     max-width: 500px;
     width: 90%;
-    margin-top: 32px;
-    margin-bottom: 32px;
+    margin-top: 24px;
 }
 
 h1 {
@@ -191,7 +187,7 @@ h1 {
     display: flex;
     gap: 24px;
     justify-content: center;
-    margin: 30px 0;
+    margin: 24px 0;
     flex-wrap: wrap;
 }
 
@@ -235,14 +231,14 @@ h1 {
 }
 
 .message {
-    margin: 20px 0;
+    margin: 8px 0;
     font-size: 1.3rem;
     font-weight: 600;
     min-height: 30px;
 }
 
 .message2 {
-    margin: 20px 0;
+    margin: 8px 0;
     font-size: 0.9rem;
     font-weight: 400;
     min-height: 30px;
@@ -305,7 +301,6 @@ h1 {
     display: flex;
     gap: 15px;
     justify-content: center;
-    margin-top: 20px;
     flex-wrap: wrap;
 }
 
@@ -558,10 +553,27 @@ h1 {
 /* Welcome Screen Styles */
 .welcome-screen {
     display: flex;
+    padding: 12px;
     align-items: center;
     justify-content: center;
-    min-height: 100vh;
-    padding: 20px;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.guide-image {
+    height: 60vh;
+    width: 75vw;
+    max-width: 75%;
+    object-fit: contain;
+    border-radius: 8px;
+}
+
+.qr-image {
+    height: 60vh;
+    width: 25vw;
+    max-width: 25%;
+    object-fit: contain;
+    border-radius: 8px;
 }
 
 .welcome-content {
@@ -569,7 +581,7 @@ h1 {
     background: rgb(250 249 250);
     padding: 40px;
     border-radius: 12px;
-    /* box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1); */
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
     backdrop-filter: blur(10px);
     max-width: 500px;
     width: 100%;
@@ -608,6 +620,20 @@ h1 {
 
 .guide-steps {
     margin-bottom: 20px;
+}
+
+.icon-scrolling {
+    display: flex;
+    flex-direction: row;
+    gap: 12px;
+}
+
+.icon-serivce {
+    width: 80px;
+    height: 80px;
+    object-fit: contain;
+    border-radius: 8px;
+    border: 2px solid #e2e8f0;
 }
 
 .guide-step {
@@ -717,3 +743,84 @@ h1 {
         margin-bottom: 0;
     }
 } 
+
+/* Scrolling Icons Animation - Luôn hiển thị */
+.scrolling-icons-container {
+    /* position: fixed; */
+    /* top: 12px; */
+    left: 0;
+    width: 100%;
+    overflow: hidden;
+    /* z-index: 1000; */
+}
+
+.scrolling-icons {
+    display: flex;
+    animation: scroll 15s linear infinite;
+    gap: 30px;
+    align-items: center;
+    height: 100%;
+    padding: 10px 0;
+}
+
+.scrolling-icon {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    min-width: 60px;
+    padding: 8px;
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease;
+    flex-shrink: 0;
+}
+
+.scrolling-icon:hover {
+    transform: scale(1.05);
+}
+
+.scrolling-icon img {
+    width: 80px;
+    height: 80px;
+    object-fit: contain;
+    border-radius: 8px;
+    margin-right: 8px;
+    border: 2px solid #e2e8f0;
+}
+
+.scrolling-icon span {
+    font-size: 9px;
+    text-align: center;
+    color: #333;
+    line-height: 1.2;
+    max-width: 55px;
+    word-wrap: break-word;
+}
+
+@keyframes scroll {
+    0% {
+        transform: translateX(100%);
+    }
+    100% {
+        transform: translateX(-100%);
+    }
+}
+
+/* Pause animation on hover */
+.scrolling-icons-container:hover .scrolling-icons {
+    animation-play-state: paused;
+}
+
+.gif-dancing {
+    height: auto;
+    width: 20vw;
+    object-fit: contain;
+}
+
+.game-container-wrapper{ 
+    margin-top: 30px;
+    flex-direction: row;
+    gap: 60px;
+    display: flex;
+}
